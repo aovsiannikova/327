@@ -1,0 +1,87 @@
+/tracking/verbose -1
+/process/verbose 0
+/run/verbose 0
+/event/verbose 0
+#/vis/disable
+/tracking/storeTrajectory 0
+#
+/control/cout/ignoreThreadsExcept 0
+#
+/OpNovice/DetectorConstruction/enable_verbose false
+/OpNovice/DetectorConstruction/dumpgdml false
+/run/initialize
+#
+/process/em/auger 1
+/process/em/augerCascade 1
+/process/em/deexcitationIgnoreCut 1
+#
+/analysis/setActivation 1
+/analysis/ntuple/setActivationToAll 0
+#uncomment ntuples to fill in
+#0.number of scintillated photons
+/analysis/ntuple/setActivation 0 1
+
+#1. absorption position XY: eventID, X, Y
+#/analysis/ntuple/setActivation 1 1
+
+#2.scintillation spectrum: energy
+#/analysis/ntuple/setActivation 2 1
+
+#3. mean scintillation depth
+#/analysis/ntuple/setActivation 3 1
+
+#4. absorption spectrum
+#/analysis/ntuple/setActivation 4 1
+
+#5. optical photons interactions
+/analysis/ntuple/setActivation 5 1
+
+#6. primary interaction depth: eventID, trackID, depth, interactionID
+#/analysis/ntuple/setActivation 6 1
+
+#7.
+#/analysis/ntuple/setActivation 7 1
+
+#8. scattering angle: EventID, phi, theta.
+#/analysis/ntuple/setActivation 8 1
+
+#Choose the section (0-cylindrical, 1-quadratic, 2-hexagonal)
+#/opnovice2/detector/SetDetectorSection 2
+
+#Set scintillator dimensions in mm:
+/opnovice2/detector/setDetectorThickness 10
+#/opnovice2/detector/setDetectorSideLength 120
+#/opnovice2/detector/setDetectorWidth 150
+
+#Radius. For cylindrical scintillator only.
+#/opnovice2/detector/setDetectorRadius 150
+
+
+#Add (1) or remove (0) reflector. Choose its type: 0-3
+/opnovice2/detector/detectorHasReflector 1
+/opnovice2/detector/setReflectorType 0
+
+#Add (1) or remove (0) Alu housing
+/opnovice2/detector/detectorHasHousing 0
+
+#Select number of SiPMs. For quadratic section only. 1 - XY plane, 2 - XY and YZ planes, 3 - XY and 2 YZ planes.
+#/opnovice2/detector/setNumberOfSiPM 3
+
+#Set the material of the crystal.Type 0 for CeBr3, 1 for CsI(Tl) or 2 for NaI(Tl).
+/opnovice2/detector/setDetectorMaterial 2
+
+#Set gun position in cm. If not, 0.1 mm from front surface (scintillator, reflector or housing) on the Z axis is set by default.
+#/gun/position 0 1.08 -14.9
+/gun/position 0 0 -0.9
+
+#Set shooting direction in XOZ in degrees
+#/opnovice2/gun/gunAngleToZAxis 0
+/gun/direction 0 0 1
+
+/gun/particle gamma
+
+/gun/polarization 0 0 0
+
+/gun/energy 20 keV
+/run/beamOn 1
+

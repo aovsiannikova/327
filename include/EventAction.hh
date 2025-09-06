@@ -49,22 +49,56 @@ class EventAction : public G4UserEventAction
  // count scintillation photons
     void AddScintillation_ev(void) {ScintPhotons += 1;}
 
+    void AddScintillation_ev_depth(G4float z) {
+      if ((z>-5) and (z<-4)) {ScintPhotons_0 += 1;}
+      if ((z>-4) and (z<-3)) {ScintPhotons_1 += 1;}
+      if ((z>-3) and (z<-2)) {ScintPhotons_2 += 1;}
+      if ((z>-2) and (z<-1)) {ScintPhotons_3 += 1;}
+      if ((z>-1) and (z<0)) {ScintPhotons_4 += 1;}
+      if ((z>0) and (z<1)) {ScintPhotons_5 += 1;}
+      if ((z>1) and (z<2)) {ScintPhotons_6 += 1;}
+      if ((z>2) and (z<3)) {ScintPhotons_7 += 1;}
+      if ((z>3) and (z<4)) {ScintPhotons_8 += 1;}
+      if ((z>4) and (z<5)) {ScintPhotons_9 += 1;}
+
+    }
+
+// count mean scintillation depth
+   void MeanScintDepth_ev(G4double z2) {
+     Scint_depth = (Scint_depth * (ScintPhotons-1)+z2)/ScintPhotons;
+     //Scint_depth_std = (Scint_depth_std * (ScintPhotons-1)+pow((Scint_depth-z2),2))/ScintPhotons;
+
+    }
+
 
 	G4double Absenergy;
-	G4int AbsPhotonsSiPM;
-	G4int AbsPhotonsScint;
+	G4long AbsPhotonsSiPM;
+	G4long AbsPhotonsScint;
 
-	G4int AbsPhotonsSiPM_prior;
-	G4int AbsPhotonsScint_prior;
+	G4long AbsPhotonsSiPM_prior;
+	G4long AbsPhotonsScint_prior;
 
-	G4int ScintPhotons;
-	G4int TotalInternalReflection;
-	G4int FresnelRefraction;
-	G4int FresnelReflection;
-	G4int BoundAbsorption;
+	G4long ScintPhotons;
+  G4long ScintPhotons_0;
+  G4long ScintPhotons_1;
+  G4long ScintPhotons_2;
+  G4long ScintPhotons_3;
+  G4long ScintPhotons_4;
+  G4long ScintPhotons_5;
+  G4long ScintPhotons_6;
+  G4long ScintPhotons_7;
+  G4long ScintPhotons_8;
+  G4long ScintPhotons_9;
+	G4double Scint_depth;
+	G4double Scint_depth_std;
 
-	G4int LambReflection;
-	G4int SpikeReflection;
+	G4long TotalInternalReflection;
+	G4long FresnelRefraction;
+	G4long FresnelReflection;
+	G4long BoundAbsorption;
+
+	G4long LambReflection;
+	G4long SpikeReflection;
 
   private:
     RunAction*       runAction;

@@ -34,19 +34,21 @@
 #include "PrimaryGeneratorAction.hh"
 #include "PrimaryGeneratorMessenger.hh"
 
+#include "DetectorConstruction.hh"
+#include <cmath>
 #include "Randomize.hh"
 
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4ParticleDefinition.hh"
-#include "G4SystemOfUnits.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrimaryGeneratorAction::PrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(), 
-   fParticleGun(0)
+PrimaryGeneratorAction::PrimaryGeneratorAction(DetectorConstruction* detector)
+ : G4VUserPrimaryGeneratorAction(),
+   fParticleGun(nullptr),
+   fDetector(detector)
 {
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
@@ -62,9 +64,10 @@ PrimaryGeneratorAction::PrimaryGeneratorAction()
   fParticleGun->SetParticleDefinition(particle);
   fParticleGun->SetParticleTime(0.0*ns);
 
-  fParticleGun->SetParticleEnergy(1*MeV);
-  
-  fParticleGun->SetParticlePosition(G4ThreeVector(0 *cm,0 *cm,-13.1*mm));
+//  fParticleGun->SetParticleEnergy(1*MeV);
+
+  G4double fGun_z= fDetector->GetTotalThickness() + 0.1 *mm;
+  fParticleGun->SetParticlePosition(G4ThreeVector(0 *cm,0 *cm, -fGun_z));
 
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
 
@@ -82,9 +85,17 @@ PrimaryGeneratorAction::~PrimaryGeneratorAction()
 
 void PrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {
-
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void PrimaryGeneratorAction::SetGunAngleDir(G4double angle)
+{
+  G4double x_dir = tan(angle);
+  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(x_dir, 0. ,1.));
+}
+
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
@@ -109,11 +120,11 @@ void PrimaryGeneratorAction::SetOptPhotonPolar(G4double angle)
  G4ThreeVector kphoton = fParticleGun->GetParticleMomentumDirection();
  G4ThreeVector product = normal.cross(kphoton);
  G4double modul2       = product*product;
- 
+
  G4ThreeVector e_perpend (0., 0., 1.);
  if (modul2 > 0.) e_perpend = (1./std::sqrt(modul2))*product;
  G4ThreeVector e_paralle    = e_perpend.cross(kphoton);
- 
+
  G4ThreeVector polar = std::cos(angle)*e_paralle + std::sin(angle)*e_perpend;
  fParticleGun->SetParticlePolarization(polar);
 }

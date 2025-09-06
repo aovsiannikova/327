@@ -1,3 +1,6 @@
+
+
+
 #include "EventAction.hh"
 #include "G4Event.hh"
 #include "RunAction.hh"
@@ -39,33 +42,68 @@ void EventAction::BeginOfEventAction(const G4Event*)
 	SpikeReflection		= 0;
 
 	ScintPhotons = 0;
+  ScintPhotons_0 = 0;
+  ScintPhotons_1 = 0;
+  ScintPhotons_2 = 0;
+  ScintPhotons_3 = 0;
+  ScintPhotons_4 = 0;
+  ScintPhotons_5 = 0;
+  ScintPhotons_6 = 0;
+  ScintPhotons_7 = 0;
+  ScintPhotons_8 = 0;
+  ScintPhotons_9 = 0;
+
+	Scint_depth = 0.;
+  Scint_depth_std = 0.;
 
 //	G4cout << "Begin of event" << G4endl;
 }
 
-void EventAction::EndOfEventAction(const G4Event* evt)
-{
+void EventAction::EndOfEventAction(const G4Event* evt) {
 
-	  // Accumulate statistics
-	  //
+  // Accumulate statistics
+  //
+  G4int eventID = evt->GetEventID();
 
-	  // get analysis manager. add "1" if there is another Ntuple
-	  static G4AnalysisManager* analysisMan = G4AnalysisManager::Instance();
-	  analysisMan->FillNtupleIColumn(0, ScintPhotons);
-	  analysisMan->AddNtupleRow(0);
+  // get analysis manager. add "1" if there is another Ntuple
 
-	  analysisMan->FillNtupleIColumn(5, 0, AbsPhotonsSiPM);
-	  analysisMan->FillNtupleIColumn(5, 1, AbsPhotonsScint);
-	  analysisMan->FillNtupleIColumn(5, 2, AbsPhotonsSiPM_prior);
-	  analysisMan->FillNtupleIColumn(5, 3, AbsPhotonsScint_prior);
-	  analysisMan->FillNtupleIColumn(5, 4, TotalInternalReflection);
-	  analysisMan->FillNtupleIColumn(5, 5, FresnelRefraction);
-	  analysisMan->FillNtupleIColumn(5, 6, FresnelReflection);
-	  analysisMan->FillNtupleIColumn(5, 7, BoundAbsorption);
-	  analysisMan->FillNtupleIColumn(5, 8, LambReflection);
-	  analysisMan->FillNtupleIColumn(5, 9, SpikeReflection);
-	  analysisMan->AddNtupleRow(5);
+  if (ScintPhotons > 0) {
+    static G4AnalysisManager *analysisMan = G4AnalysisManager::Instance();
+    analysisMan->FillNtupleIColumn(0, eventID);
+    analysisMan->FillNtupleIColumn(1, ScintPhotons);
+    analysisMan->FillNtupleIColumn(2, ScintPhotons_0);
+    analysisMan->FillNtupleIColumn(3, ScintPhotons_1);
+    analysisMan->FillNtupleIColumn(4, ScintPhotons_2);
+    analysisMan->FillNtupleIColumn(5, ScintPhotons_3);
+    analysisMan->FillNtupleIColumn(6, ScintPhotons_4);
+    analysisMan->FillNtupleIColumn(7, ScintPhotons_5);
+    analysisMan->FillNtupleIColumn(8, ScintPhotons_6);
+    analysisMan->FillNtupleIColumn(9, ScintPhotons_7);
+    analysisMan->FillNtupleIColumn(10, ScintPhotons_8);
+    analysisMan->FillNtupleIColumn(11, ScintPhotons_9);
 
+    analysisMan->AddNtupleRow(0);
+
+    analysisMan->FillNtupleIColumn(3, 0, eventID);
+    analysisMan->FillNtupleFColumn(3, 1, Scint_depth / mm);
+    analysisMan->AddNtupleRow(3);
+
+
+    analysisMan->FillNtupleIColumn(5, 0, AbsPhotonsSiPM);
+    analysisMan->FillNtupleIColumn(5, 1, AbsPhotonsScint);
+    analysisMan->FillNtupleIColumn(5, 2, AbsPhotonsSiPM_prior);
+    analysisMan->FillNtupleIColumn(5, 3, AbsPhotonsScint_prior);
+    analysisMan->FillNtupleIColumn(5, 4, TotalInternalReflection);
+    analysisMan->FillNtupleIColumn(5, 5, FresnelRefraction);
+    analysisMan->FillNtupleIColumn(5, 6, FresnelReflection);
+    analysisMan->FillNtupleIColumn(5, 7, BoundAbsorption);
+    analysisMan->FillNtupleIColumn(5, 8, LambReflection);
+    analysisMan->FillNtupleIColumn(5, 9, SpikeReflection);
+    analysisMan->AddNtupleRow(5);
+  }
+
+//  analysisMan->FillNtupleFColumn(7, 0, pow(Scint_depth_std,0.5)/mm);
+//  analysisMan->AddNtupleRow(7);
 
   // Print per event (modulo n)
   //

@@ -34,11 +34,13 @@
 #include "SteppingAction.hh"
 #include "TrackingAction.hh"
 #include "EventAction.hh"
+#include "DetectorConstruction.hh"
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-ActionInitialization::ActionInitialization()
- : G4VUserActionInitialization()
+ActionInitialization::ActionInitialization(DetectorConstruction* detector)
+ : G4VUserActionInitialization(),
+ fDetector(detector)
 {}
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -57,7 +59,7 @@ void ActionInitialization::BuildForMaster() const
 
 void ActionInitialization::Build() const
 {
-  PrimaryGeneratorAction* primary = new PrimaryGeneratorAction();
+  PrimaryGeneratorAction* primary = new PrimaryGeneratorAction(fDetector);
   SetUserAction(primary);
 
 RunAction* run = new RunAction(primary);

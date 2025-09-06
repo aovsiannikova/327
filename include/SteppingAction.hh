@@ -32,16 +32,23 @@
 
 #ifndef SteppingAction_h
 #define SteppingAction_h 1
-
 #include "G4UserSteppingAction.hh"
+#include "G4Step.hh"
+#include "HistoManager.hh"
 #include "globals.hh"
+#include "Run.hh"
 
 class EventAction;
 
 class SteppingAction : public G4UserSteppingAction
 {
   public:
-    SteppingAction(EventAction*);
+    SteppingAction(
+            EventAction*,
+            G4bool primary_int= true
+            );
+
+
     virtual ~SteppingAction();
 
     // method from the base class
@@ -49,7 +56,10 @@ class SteppingAction : public G4UserSteppingAction
 
   private:
     EventAction* event;
+    G4bool fPrimaryInt;
+    G4bool theta;
 
+    void GammaPrimaryInteraction(const G4Step *step, G4AnalysisManager *aMan, G4int evID, Run *run);
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

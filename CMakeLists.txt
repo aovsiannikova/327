@@ -23,15 +23,17 @@ include(${Geant4_USE_FILE})
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
-include_directories(${PROJECT_SOURCE_DIR}/include
+include_directories(${PROJECT_SOURCE_DIR}/include 
                     ${Geant4_INCLUDE_DIR})
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cc)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/include/*.hh)
+file(GLOB inputs ${PROJECT_SOURCE_DIR}/*.in)
+file(GLOB macros ${PROJECT_SOURCE_DIR}/*.mac)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #
-add_executable(OpNovice2 OpNovice2.cc ${sources} ${headers})
+add_executable(OpNovice2 OpNovice2.cc ${sources} ${headers} include/DetectorMaterials.hh)
 target_link_libraries(OpNovice2 ${Geant4_LIBRARIES} )
 
 #----------------------------------------------------------------------------
@@ -41,6 +43,7 @@ target_link_libraries(OpNovice2 ${Geant4_LIBRARIES} )
 #
 set(OpNovice2_SCRIPTS
     1gamma.mac
+    1.mac
     vis.mac
   )
 
@@ -56,3 +59,4 @@ endforeach()
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
 #
 install(TARGETS OpNovice2 DESTINATION bin)
+

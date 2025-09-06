@@ -57,6 +57,8 @@ class PrimaryGeneratorMessenger: public G4UImessenger
     PrimaryGeneratorAction*         fPrimaryAction;
     G4UIdirectory*                  fGunDir;
     G4UIcmdWithADoubleAndUnit*      fPolarCmd;
+    G4UIcmdWithADoubleAndUnit*      SetGunAngle;
+
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

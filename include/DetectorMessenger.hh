@@ -43,6 +43,7 @@ class G4UIcommand;
 class G4UIcmdWithAString;
 class G4UIcmdWithAnInteger;
 class G4UIcmdWithADouble;
+class G4UIcmdWithABool;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithoutParameter;
 
@@ -62,13 +63,27 @@ class DetectorMessenger: public G4UImessenger
     DetectorConstruction*      fDetector;
       
     G4UIdirectory*             fOpticalDir;
-   
+    G4UIdirectory*             fDetectorDir;
+
     // the surface
     G4UIcmdWithAString*        fSurfaceTypeCmd;
     G4UIcmdWithAString*        fSurfaceFinishCmd;
     G4UIcmdWithAString*        fSurfaceModelCmd;
     G4UIcmdWithADouble*        fSurfaceSigmaAlphaCmd;
     G4UIcmdWithAString*        fSurfaceMatPropVectorCmd;
+
+    //the detector
+    G4UIcmdWithAnInteger*      fDetectorSetSectionCmd;
+    G4UIcmdWithABool*          fDetectorHasReflectorCmd;
+    G4UIcmdWithABool*          fDetectorHasHousingCmd;
+    G4UIcmdWithAnInteger*      fDetectorSetNumberOfSiPM;
+    G4UIcmdWithADouble*        fDetectorSetThicknessCmd;
+    G4UIcmdWithAnInteger*      fReflectorSetTypeCmd;
+    G4UIcmdWithADouble*        fDetectorSetSideLengthCmd;
+    G4UIcmdWithADouble*        fDetectorSetWidthCmd;
+
+    G4UIcmdWithADouble*        fDetectorSetRadiusCmd;
+    G4UIcmdWithAnInteger*      fDetectorSetMaterialCmd;
 
     // the box 
     G4UIcmdWithAString*        fBoxMatPropVectorCmd;
@@ -77,7 +92,6 @@ class DetectorMessenger: public G4UImessenger
     // the world
     G4UIcmdWithAString*        fWorldMatPropVectorCmd;
     G4UIcmdWithAString*        fWorldMatConstPropVectorCmd;
-
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

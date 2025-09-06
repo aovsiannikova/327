@@ -1,0 +1,59 @@
+/run/verbose 0
+/process/verbose 0
+/event/verbose 0
+/tracking/verbose -1
+#/vis/disable
+/tracking/storeTrajectory 0
+
+/process/em/auger 1
+/process/em/augerCascade 1
+#/process/em/pixe 1
+/process/em/deexcitationIgnoreCut 1
+#/process/em/pixeXSmodel
+
+/analysis/setActivation 1
+/analysis/ntuple/setActivationToAll 0
+#uncomment ntuples to fill in
+#0.number of scintillated photons
+/analysis/ntuple/setActivation 0 1
+
+#1. absorption position XY: eventID, X, Y
+#/analysis/ntuple/setActivation 1 1
+
+#2.scintillation spectrum: energy
+#/analysis/ntuple/setActivation 2 1
+
+#3. mean scintillation depth
+/analysis/ntuple/setActivation 3 1
+
+#4. absorption spectrum
+#/analysis/ntuple/setActivation 4 1
+
+#5. optical photons interactions
+#/analysis/ntuple/setActivation 5 1
+
+#6. primary interaction depth: eventID, trackID, depth, interactionID
+/analysis/ntuple/setActivation 6 1
+
+#7.
+#/analysis/ntuple/setActivation 7 1
+
+#8. scattering angle: EventID, phi_ theta.
+#/analysis/ntuple/setActivation 8 1
+
+
+/opnovice2/detector/detectorShapeQuadratic 1
+/opnovice2/detector/detectorSetThickness 5
+/opnovice2/detector/detectorSetSideLength 25.5
+/opnovice2/detector/setReflectorType 0
+/opnovice2/detector/detectorHasAlu 1
+/opnovice2/detector/detectorHasReflector 1
+
+/gun/particle gamma
+
+/gun/polarization 0 0 0
+
+/gun/direction 0 0 1
+/gun/position 0 0 -8.1 mm
+/gun/energy 1000 keV
+/run/beamOn 1

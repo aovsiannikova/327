@@ -6,6 +6,8 @@
 #
 /control/verbose 1
 /run/verbose 0
+/process/verbose 0
+
 #
 /run/initialize
 #

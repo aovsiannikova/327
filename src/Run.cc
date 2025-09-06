@@ -141,6 +141,8 @@ void Run::EndOfRun()
   G4cout <<   "---------------------------------\n";
   G4cout << "Primary particle was: " << fParticle->GetParticleName()
          << " with energy " << G4BestUnit(fEkin/MeV, "Energy") << "." << G4endl;
+  G4cout << "# of primary particles:      " << std::setw(8) << TotNbofEvents
+                << G4endl;
 
   G4cout << "Primary interactions in a run: " << G4endl;
   if (fConv>0){
@@ -166,189 +168,194 @@ void Run::EndOfRun()
     }
   }
   G4cout.precision(5);
-  G4cout << "OpAbsorption:      " << fOpAbsorption << "                of total created, %: " << fOpAbsorption*100/fScintCount   << G4endl;
+  if (fScintCount > 0) {
+    G4cout << "OpAbsorption:      " << fOpAbsorption << "                of total created, %: "
+           << fOpAbsorption * 100 / fScintCount << G4endl;
+
 
 // Photons absorbed in SiPM
-  G4cout << "OpAbsorption per event in SiPM:      " << fSiPMOpAbsorption         << G4endl;
+    G4cout << "OpAbsorption in SiPM:      " << fSiPMOpAbsorption << "         of total absorbed, %: "
+           << fSiPMOpAbsorption * 100 / fOpAbsorption << G4endl;
 
 // Photons absorbed in Scintillator
-  G4cout << "OpAbsorption per event in Scintillator:      " << fScOpAbsorption   << G4endl;
+    G4cout << "OpAbsorption per event in Scintillator:      " << fScOpAbsorption << "         of total absorbed, %: "
+           << fScOpAbsorption * 100 / fOpAbsorption << G4endl;
 
 
+    G4cout << "OpAbsorption before surface: " << std::setw(8)
+           << fOpAbsorptionPrior << "                of total created, %: "
+           << fOpAbsorptionPrior * 100 / fScintCount << "                of total absorbed, %: "
+           << fOpAbsorptionPrior * 100 / fOpAbsorption << G4endl;
+    G4cout << "OpAbsorption before surface in SiPM: " << std::setw(8)
+           << fOpAbsorptionPriorSiPM << G4endl;
+    G4cout << "OpAbsorption before surface in scintillator: " << std::setw(8)
+           << fOpAbsorptionPriorScint << G4endl;
 
-  G4cout << "\nSurface events this run:" << G4endl;
-  G4cout << "# of primary particles:      " << std::setw(8) << TotNbofEvents
-         << G4endl;
-  G4cout << "OpAbsorption before surface: " << std::setw(8)
-         << fOpAbsorptionPrior << G4endl;
-  G4cout << "OpAbsorption before surface in SiPM: " << std::setw(8)
-         << fOpAbsorptionPriorSiPM << G4endl;
-  G4cout << "OpAbsorption before surface in scintillator: " << std::setw(8)
-         << fOpAbsorptionPriorScint << G4endl;
+    G4cout << "\nSurface events this run:" << G4endl;
+    G4cout << "Total # of surface events:   " << std::setw(8) << fTotalSurface << "         of total created, %: "
+           << fTotalSurface * 100 / fScintCount << G4endl;
 
-  G4cout << "Total # of surface events:   " << std::setw(8) << fTotalSurface
-         << G4endl;
-  if (fParticle->GetParticleName() == "opticalphoton") {
-    G4cout << "Unaccounted for:             " << std::setw(8)
-         << fTotalSurface + fOpAbsorptionPrior - TotNbofEvents << G4endl;
+    if (fParticle->GetParticleName() == "opticalphoton") {
+      G4cout << "Unaccounted for:             " << std::setw(8)
+             << fTotalSurface + fOpAbsorptionPrior - TotNbofEvents << G4endl;
+    }
+    G4cout << "\nSurface events by process:" << G4endl;
+    if (fBoundaryProcs[Transmission] > 0) {
+      G4cout << "  Transmission:              " << std::setw(8)
+             << fBoundaryProcs[Transmission] << G4endl;
+    }
+    if (fBoundaryProcs[FresnelRefraction] > 0) {
+      G4cout << "  Fresnel refraction:        " << std::setw(8)
+             << fBoundaryProcs[FresnelRefraction] << G4endl;
+    }
+    if (fBoundaryProcs[FresnelReflection] > 0) {
+      G4cout << "  Fresnel reflection:        " << std::setw(8)
+             << fBoundaryProcs[FresnelReflection] << G4endl;
+    }
+    if (fBoundaryProcs[TotalInternalReflection] > 0) {
+      G4cout << "  Total internal reflection: " << std::setw(8)
+             << fBoundaryProcs[TotalInternalReflection] << G4endl;
+    }
+    if (fBoundaryProcs[LambertianReflection] > 0) {
+      G4cout << "  Lambertian reflection:     " << std::setw(8)
+             << fBoundaryProcs[LambertianReflection] << G4endl;
+    }
+    if (fBoundaryProcs[LobeReflection] > 0) {
+      G4cout << "  Lobe reflection:           " << std::setw(8)
+             << fBoundaryProcs[LobeReflection] << G4endl;
+    }
+    if (fBoundaryProcs[SpikeReflection] > 0) {
+      G4cout << "  Spike reflection:          " << std::setw(8)
+             << fBoundaryProcs[SpikeReflection] << G4endl;
+    }
+    if (fBoundaryProcs[BackScattering] > 0) {
+      G4cout << "  Backscattering:            " << std::setw(8)
+             << fBoundaryProcs[BackScattering] << G4endl;
+    }
+    if (fBoundaryProcs[Absorption] > 0) {
+      G4cout << "  Absorption:                " << std::setw(8)
+             << fBoundaryProcs[Absorption] << G4endl;
+    }
+    if (fBoundaryProcs[Detection] > 0) {
+      G4cout << "  Detection:                 " << std::setw(8)
+             << fBoundaryProcs[Detection] << G4endl;
+    }
+    if (fBoundaryProcs[NotAtBoundary] > 0) {
+      G4cout << "  Not at boundary:           " << std::setw(8)
+             << fBoundaryProcs[NotAtBoundary] << G4endl;
+    }
+    if (fBoundaryProcs[SameMaterial] > 0) {
+      G4cout << "  Same material:             " << std::setw(8)
+             << fBoundaryProcs[SameMaterial] << G4endl;
+    }
+    if (fBoundaryProcs[StepTooSmall] > 0) {
+      G4cout << "  Step too small:            " << std::setw(8)
+             << fBoundaryProcs[StepTooSmall] << G4endl;
+    }
+    if (fBoundaryProcs[NoRINDEX] > 0) {
+      G4cout << "  No RINDEX:                 " << std::setw(8)
+             << fBoundaryProcs[NoRINDEX] << G4endl;
+    }
+    // LBNL polished
+    if (fBoundaryProcs[PolishedLumirrorAirReflection] > 0) {
+      G4cout << "  Polished Lumirror Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedLumirrorAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedLumirrorGlueReflection] > 0) {
+      G4cout << "  Polished Lumirror Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedLumirrorGlueReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedAirReflection] > 0) {
+      G4cout << "  Polished Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedTeflonAirReflection] > 0) {
+      G4cout << "  Polished Teflon Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedTeflonAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedTiOAirReflection] > 0) {
+      G4cout << "  Polished TiO Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedTiOAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedTyvekAirReflection] > 0) {
+      G4cout << "  Polished Tyvek Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedTyvekAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedVM2000AirReflection] > 0) {
+      G4cout << "  Polished VM2000 Air reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedVM2000AirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[PolishedVM2000GlueReflection] > 0) {
+      G4cout << "  Polished VM2000 Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[PolishedVM2000GlueReflection] << G4endl;
+    }
+    // LBNL etched
+    if (fBoundaryProcs[EtchedLumirrorAirReflection] > 0) {
+      G4cout << "  Etched Lumirror Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedLumirrorAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedLumirrorGlueReflection] > 0) {
+      G4cout << "  Etched Lumirror Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedLumirrorGlueReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedAirReflection] > 0) {
+      G4cout << "  Etched Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedTeflonAirReflection] > 0) {
+      G4cout << "  Etched Teflon Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedTeflonAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedTiOAirReflection] > 0) {
+      G4cout << "  Etched TiO Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedTiOAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedTyvekAirReflection] > 0) {
+      G4cout << "  Etched Tyvek Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedTyvekAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedVM2000AirReflection] > 0) {
+      G4cout << "  Etched VM2000 Air reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedVM2000AirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[EtchedVM2000GlueReflection] > 0) {
+      G4cout << "  Etched VM2000 Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[EtchedVM2000GlueReflection] << G4endl;
+    }
+    // LBNL ground
+    if (fBoundaryProcs[GroundLumirrorAirReflection] > 0) {
+      G4cout << "  Ground Lumirror Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundLumirrorAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundLumirrorGlueReflection] > 0) {
+      G4cout << "  Ground Lumirror Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundLumirrorGlueReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundAirReflection] > 0) {
+      G4cout << "  Ground Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundTeflonAirReflection] > 0) {
+      G4cout << "  Ground Teflon Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundTeflonAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundTiOAirReflection] > 0) {
+      G4cout << "  Ground TiO Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundTiOAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundTyvekAirReflection] > 0) {
+      G4cout << "  Ground Tyvek Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundTyvekAirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundVM2000AirReflection] > 0) {
+      G4cout << "  Ground VM2000 Air reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundVM2000AirReflection] << G4endl;
+    }
+    if (fBoundaryProcs[GroundVM2000GlueReflection] > 0) {
+      G4cout << "  Ground VM2000 Glue reflection: " << std::setw(8)
+             << fBoundaryProcs[GroundVM2000GlueReflection] << G4endl;
+    }
   }
-  G4cout << "\nSurface events by process:" << G4endl;
-  if (fBoundaryProcs[Transmission] > 0) {
-    G4cout << "  Transmission:              " << std::setw(8)
-           << fBoundaryProcs[Transmission] << G4endl;
-  }
-  if (fBoundaryProcs[FresnelRefraction] > 0) {
-    G4cout << "  Fresnel refraction:        " << std::setw(8)
-           << fBoundaryProcs[FresnelRefraction] << G4endl;
-  }
-  if (fBoundaryProcs[FresnelReflection] > 0) {
-    G4cout << "  Fresnel reflection:        " << std::setw(8)
-           << fBoundaryProcs[FresnelReflection] << G4endl;
-  }
-  if (fBoundaryProcs[TotalInternalReflection] > 0) {
-    G4cout << "  Total internal reflection: " << std::setw(8)
-           << fBoundaryProcs[TotalInternalReflection] << G4endl;
-  }
-  if (fBoundaryProcs[LambertianReflection] > 0) {
-    G4cout << "  Lambertian reflection:     " << std::setw(8)
-           << fBoundaryProcs[LambertianReflection] << G4endl;
-  }
-  if (fBoundaryProcs[LobeReflection] > 0) {
-    G4cout << "  Lobe reflection:           " << std::setw(8)
-           << fBoundaryProcs[LobeReflection] << G4endl;
-  }
-  if (fBoundaryProcs[SpikeReflection] > 0) {
-    G4cout << "  Spike reflection:          " << std::setw(8)
-           << fBoundaryProcs[SpikeReflection] << G4endl;
-  }
-  if (fBoundaryProcs[BackScattering] > 0) {
-    G4cout << "  Backscattering:            " << std::setw(8)
-           << fBoundaryProcs[BackScattering] << G4endl;
-  }
-  if (fBoundaryProcs[Absorption] > 0) {
-    G4cout << "  Absorption:                " << std::setw(8)
-           << fBoundaryProcs[Absorption] << G4endl;
-  }
-  if (fBoundaryProcs[Detection] > 0) {
-    G4cout << "  Detection:                 " << std::setw(8)
-           << fBoundaryProcs[Detection] << G4endl;
-  }
-  if (fBoundaryProcs[NotAtBoundary] > 0) {
-    G4cout << "  Not at boundary:           " << std::setw(8)
-           << fBoundaryProcs[NotAtBoundary] << G4endl;
-  }
-  if (fBoundaryProcs[SameMaterial] > 0) {
-    G4cout << "  Same material:             " << std::setw(8)
-           << fBoundaryProcs[SameMaterial] << G4endl;
-  }
-  if (fBoundaryProcs[StepTooSmall] > 0) {
-    G4cout << "  Step too small:            " << std::setw(8)
-           << fBoundaryProcs[StepTooSmall] << G4endl;
-  }
-  if (fBoundaryProcs[NoRINDEX] > 0) {
-    G4cout << "  No RINDEX:                 " << std::setw(8)
-           << fBoundaryProcs[NoRINDEX] << G4endl;
-  }
-  // LBNL polished
-  if (fBoundaryProcs[PolishedLumirrorAirReflection] > 0) {
-    G4cout << "  Polished Lumirror Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedLumirrorAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedLumirrorGlueReflection] > 0) {
-    G4cout << "  Polished Lumirror Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedLumirrorGlueReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedAirReflection] > 0) {
-    G4cout << "  Polished Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedTeflonAirReflection] > 0) {
-    G4cout << "  Polished Teflon Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedTeflonAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedTiOAirReflection] > 0) {
-    G4cout << "  Polished TiO Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedTiOAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedTyvekAirReflection] > 0) {
-    G4cout << "  Polished Tyvek Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedTyvekAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedVM2000AirReflection] > 0) {
-    G4cout << "  Polished VM2000 Air reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedVM2000AirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[PolishedVM2000GlueReflection] > 0) {
-    G4cout << "  Polished VM2000 Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[PolishedVM2000GlueReflection] << G4endl;
-  }
-  // LBNL etched
-  if (fBoundaryProcs[EtchedLumirrorAirReflection] > 0) {
-    G4cout << "  Etched Lumirror Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedLumirrorAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedLumirrorGlueReflection] > 0) {
-    G4cout << "  Etched Lumirror Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedLumirrorGlueReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedAirReflection] > 0) {
-    G4cout << "  Etched Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedTeflonAirReflection] > 0) {
-    G4cout << "  Etched Teflon Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedTeflonAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedTiOAirReflection] > 0) {
-    G4cout << "  Etched TiO Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedTiOAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedTyvekAirReflection] > 0) {
-    G4cout << "  Etched Tyvek Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedTyvekAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedVM2000AirReflection] > 0) {
-    G4cout << "  Etched VM2000 Air reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedVM2000AirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[EtchedVM2000GlueReflection] > 0) {
-    G4cout << "  Etched VM2000 Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[EtchedVM2000GlueReflection] << G4endl;
-  }
-  // LBNL ground
-  if (fBoundaryProcs[GroundLumirrorAirReflection] > 0) {
-    G4cout << "  Ground Lumirror Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundLumirrorAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundLumirrorGlueReflection] > 0) {
-    G4cout << "  Ground Lumirror Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundLumirrorGlueReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundAirReflection] > 0) {
-    G4cout << "  Ground Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundTeflonAirReflection] > 0) {
-    G4cout << "  Ground Teflon Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundTeflonAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundTiOAirReflection] > 0) {
-    G4cout << "  Ground TiO Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundTiOAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundTyvekAirReflection] > 0) {
-    G4cout << "  Ground Tyvek Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundTyvekAirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundVM2000AirReflection] > 0) {
-    G4cout << "  Ground VM2000 Air reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundVM2000AirReflection] << G4endl;
-  }
-  if (fBoundaryProcs[GroundVM2000GlueReflection] > 0) {
-    G4cout << "  Ground VM2000 Glue reflection: " << std::setw(8)
-           << fBoundaryProcs[GroundVM2000GlueReflection] << G4endl;
-  }
-
   G4int sum = std::accumulate(fBoundaryProcs.begin(), fBoundaryProcs.end(), 0);
   G4cout << " Sum:                        " << std::setw(8) << sum << G4endl;
   G4cout << " Unaccounted for:            " << std::setw(8)

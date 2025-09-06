@@ -37,6 +37,7 @@
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "globals.hh"
+#include "DetectorConstruction.hh"
 
 class G4Event;
 class PrimaryGeneratorMessenger;
@@ -46,7 +47,7 @@ class PrimaryGeneratorMessenger;
 class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
   public:
-    PrimaryGeneratorAction();
+    PrimaryGeneratorAction(DetectorConstruction* );
     virtual ~PrimaryGeneratorAction();
 
     virtual void GeneratePrimaries(G4Event*);
@@ -55,10 +56,12 @@ class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     void SetOptPhotonPolar();
     void SetOptPhotonPolar(G4double);
+    void SetGunAngleDir(G4double);
 
   private:
     G4ParticleGun* fParticleGun;
     PrimaryGeneratorMessenger* fGunMessenger;
+    DetectorConstruction* fDetector;
 };
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

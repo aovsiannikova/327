@@ -56,6 +56,16 @@ PrimaryGeneratorMessenger::
   fPolarCmd->SetDefaultValue(-360.0);
   fPolarCmd->SetDefaultUnit("deg");
   fPolarCmd->AvailableForStates(G4State_Idle);
+
+  SetGunAngle=
+          new G4UIcmdWithADoubleAndUnit("/opnovice2/gun/gunAngleToZAxis",this);
+  SetGunAngle->SetGuidance("Set angle of shooting direction");
+  SetGunAngle->SetGuidance("  to z axis");
+  SetGunAngle->SetParameterName("dir_angle",true);
+  SetGunAngle->SetUnitCategory("Angle");
+  SetGunAngle->SetDefaultValue(0.0);
+  SetGunAngle->SetDefaultUnit("deg");
+  SetGunAngle->AvailableForStates(G4State_Idle, G4State_PreInit);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -63,6 +73,7 @@ PrimaryGeneratorMessenger::
 PrimaryGeneratorMessenger::~PrimaryGeneratorMessenger()
 {
   delete fPolarCmd;
+  delete SetGunAngle;
   delete fGunDir;
 }
 
@@ -72,12 +83,18 @@ void PrimaryGeneratorMessenger::SetNewValue(
                                         G4UIcommand* command, G4String newValue)
 {
   if (command == fPolarCmd) {
-      G4double angle = fPolarCmd->GetNewDoubleValue(newValue);
+    G4double angle;
+    angle = fPolarCmd->GetNewDoubleValue(newValue);
       if (angle == -360.0*deg) {
          fPrimaryAction->SetOptPhotonPolar();
       } else {
          fPrimaryAction->SetOptPhotonPolar(angle);
       }
+  }
+  if (command == SetGunAngle) {
+    G4double dir_angle;
+    dir_angle = SetGunAngle->GetNewDoubleValue(newValue);
+    fPrimaryAction->SetGunAngleDir(dir_angle);
   }
 }
 

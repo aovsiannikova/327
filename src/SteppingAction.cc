@@ -36,7 +36,6 @@
 #include "TrackInformation.hh"
 #include "Run.hh"
 
-#include "G4Cerenkov.hh"
 #include "G4Scintillation.hh"
 #include "G4OpBoundaryProcess.hh"
 
@@ -53,8 +52,9 @@
 
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-SteppingAction::SteppingAction(EventAction* EvAct)
-:event(EvAct)
+SteppingAction::SteppingAction(EventAction* EvAct, G4bool primary_int)
+:event(EvAct),
+fPrimaryInt(primary_int)
 
 {}
 
@@ -66,11 +66,12 @@ SteppingAction::~SteppingAction()
 void SteppingAction::UserSteppingAction(const G4Step* step)
 {
   G4bool absorb_position=1; 	   //write down eventID, x (and y) for optical photons absorbed in SiPM 	nt_absorption.csv/h2_absXY.csv 	#1
-  G4bool status         =1;		   //write down optical photons interaction					                      nt_status.csv		                #5
-  G4bool abs_spectrum   =0;	     //spectrum of the optical photons absorbed in SiPM 			              nt_abs_sp.csv		                #4
+  G4bool status         =0;		   //write down optical photons interaction		                   nt_status.csv		                #5
+  G4bool abs_spectrum   =0;	     //spectrum of the optical photons absorbed in SiPM 		              nt_abs_sp.csv		                #4
   G4bool scint_spectrum =0;	     //spectrum of scintillated optical photons			                        nt_scintillation.csv	          #2
-  G4bool scint_depth    =0;		   //eventID and z of the scintillation process				                    nt_scint_depth.csv	            #3
-  G4bool pr_int         =0;		   //primary interaction of gamma photons                                 nt_pr_int.csv                   #6
+  G4bool scint_depth    =1;		   //z of the scintillation process			                    nt_scint_depth.csv	            #3
+  theta         =false;		   //primary interaction of gamma photons                                 nt_pr_int.csv                   #6
+
 
 
 
@@ -83,12 +84,12 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                G4RunManager::GetRunManager()->GetNonConstCurrentRun());
 
   G4Track* track = step->GetTrack();
+  G4int eventID 	= G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
   G4StepPoint* endPoint   = step->GetPostStepPoint();
   G4StepPoint* startPoint = step->GetPreStepPoint();
 
   G4String particleName = track->GetDynamicParticle()->
                                  GetParticleDefinition()->GetParticleName();
-
 
   TrackInformation* trackInfo =
                         (TrackInformation*)(track->GetUserInformation());
@@ -101,42 +102,45 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     if (pds->GetProcessName() == "OpAbsorption") {
         run->AddOpAbsorption ();
         const G4String currentPhysicalName = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-        if (status)	{
-            if (currentPhysicalName=="SiPM") {
+
+            if ((currentPhysicalName=="SiPMXY") or (currentPhysicalName=="SiPMYZ2") or (currentPhysicalName=="SiPMYZ1")
+            or (currentPhysicalName=="SiPM_Box1") or (currentPhysicalName=="SiPM_Box2") or (currentPhysicalName=="SiPMTrap1")
+            or (currentPhysicalName=="SiPMTrap2")) { //
 
                 run->AddSiPMOpAbsorption();
                 event->AddSiPMOpAbsorption_ev();
-
-// *****************   get position of the optical photons absorbed in SiPM                 ************************************************
-
-                if (absorb_position == 1) {
+// *****************   get position of the optical photons absorbed in SiPM                ************************************************
+                if (absorb_position) {
         			       G4ThreeVector dir = endPoint->GetPosition();
         			       G4double x1 = dir.x();
         			       G4double y1 = dir.y();
-          			     G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-
         			       // fill histogram with absorption position (XY)            ****************************************************
-                     analysisMan->FillH2(0, x1/mm, y1/mm);
-        			       // fill histogram with absorption position (X) and eventID            ****************************************************
-                     analysisMan->FillH2(1, x1/mm, eventID);
+                     //analysisMan->FillH2(0, x1/mm, y1/mm);
+                     // fill histogram with absorption position (R)            ****************************************************
+                     //analysisMan->FillH1(1, sqrt(pow(x1,2) + pow(y1,2))/mm);
+                     // fill histogram with absorption position (X)            ****************************************************
+                     //analysisMan->FillH1(2, x1/mm);
 
+                     // fill histogram with absorption position (X) and eventID            ****************************************************
+                     //analysisMan->FillH2(1, x1/mm, eventID);
+                      // fill histogram with absorption position (R) and eventID            ****************************************************
+                     analysisMan->FillH2(2, sqrt(pow(x1,2) + pow(y1,2))/mm, eventID);
 				             // fill ntuple with absorption position (XY)
-                		 analysisMan->FillNtupleFColumn(1, 0, x1/mm);
-                		 analysisMan->FillNtupleFColumn(1, 1, y1/mm);
-        			       analysisMan->AddNtupleRow(1);
-        		    }
-
+				             //analysisMan->FillNtupleIColumn(1, 0, eventID);
+                		 //analysisMan->FillNtupleFColumn(1, 1, x1/mm);
+                		 //analysisMan->FillNtupleFColumn(1, 2, y1/mm);
+        			       //analysisMan->AddNtupleRow(1);
+                }
                 if (abs_spectrum){
+
         			       G4double ekin = endPoint->GetKineticEnergy();
-                     analysisMan->FillNtupleFColumn(4, 0, ekin/eV);
+                                        analysisMan->FillNtupleFColumn(4, 0, ekin/eV);
         			       analysisMan->AddNtupleRow(4);
                 }
-        	}
-
+            }
             if (currentPhysicalName=="Scintillator") {
                 run->AddScOpAbsorption();
                 event->AddScintOpAbsorption_ev();
-
             }
 
             if (trackInfo->GetIsFirstTankX()) {
@@ -150,7 +154,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
                     event->AddOpAbsorptionPriorSiPM_ev();
                 }
             }
-        } // if (absorption)
+
     }
     else if (pds->GetProcessName() == "OpRayleigh") {
       run->AddRayleigh();
@@ -247,75 +251,50 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 
   else { // particle != opticalphoton
 
-		if ((particleName == "gamma") and (pr_int)) {
+		if ((particleName == "gamma") and (fPrimaryInt)) {
 
-					G4ThreeVector vec = endPoint->GetPosition();
-					G4double z2 	= vec.z();
-					G4int eventID 	= G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+		    GammaPrimaryInteraction(step, analysisMan, eventID, run);
 
-			    analysisMan->FillNtupleIColumn(6, 0, eventID);
-			    analysisMan->FillNtupleIColumn(6, 1, track->GetTrackID());
-	      	analysisMan->FillNtupleFColumn(6, 2, z2/mm);
-
-					if (endPoint->GetProcessDefinedStep()->GetProcessName()=="conv"){
-						run->AddConv();
-	      		analysisMan->FillNtupleIColumn(6, 3, 0);		//conv - 0
-	      		analysisMan->AddNtupleRow(6);
-					}
-
-					else if (endPoint->GetProcessDefinedStep()->GetProcessName()=="compt"){
-						run->AddCompt();
-	      		analysisMan->FillNtupleIColumn(6, 3, 1);		//compt - 1
-	      		analysisMan->AddNtupleRow(6);
-					}
-
-					else if (endPoint->GetProcessDefinedStep()->GetProcessName()=="phot"){
-						run->AddPhot();
-	      		analysisMan->FillNtupleIColumn(6, 3, 2);		//phot - 2
-	      		analysisMan->AddNtupleRow(6);
-					}
-
-					else {
-
-						run->AddOtherGammaInt();
-			      analysisMan->FillNtupleIColumn(6, 3, 3);
-			      analysisMan->AddNtupleRow(6);
-					}
 		}
+
     const std::vector<const G4Track*>* secondaries =
                                 step->GetSecondaryInCurrentStep();
     for (auto sec : *secondaries) {
       	if (sec->GetDynamicParticle()->GetParticleDefinition() == opticalphoton){
             if (sec->GetCreatorProcess()
                     ->GetProcessName().compare("Scintillation") == 0) {
+                //		Counts scintillation photons in a run.
+                run->AddScintillation();
+
 
                 if (scint_depth){
 		                //*******************+ Get creation depth  *****************
                     G4ThreeVector vec = endPoint->GetPosition();
-                    G4double z2 = vec.z();
-               	    G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+                    G4double z2 = vec.z()/mm;
+                  // 		counts scintillation photons in event
 
-	        	        // fill ntuple with scintillation position and eventID                          ****************************************************
-    	              analysisMan = G4AnalysisManager::Instance();
-                    analysisMan->FillNtupleIColumn(3, 0, eventID);
-                    analysisMan->FillNtupleFColumn(3, 1, z2/mm);
-                    analysisMan->AddNtupleRow(3);
+                    G4float z_scint = sec->GetPosition().z()/mm;
+                    event->AddScintillation_ev_depth(z2);
+
+                  //event->AddScintillation_ev_depth2(z_scint);
+	        	        // compute mean scintillation position                          ****************************************************
+                    //event->MeanScintDepth_ev(z2);
                 }
-
-		            //		Get emission spectra.               *************************************
-                G4double en = sec->GetKineticEnergy();
-                run->AddScintillationEnergy(en);
-
-                if (scint_spectrum){
-                    analysisMan->FillNtupleFColumn(2, 0, en/eV);
-                    analysisMan->AddNtupleRow(2);
-                }
-
-                //		Counts scintillation photons in a run.
-                run->AddScintillation();
-
                 // 		counts scintillation photons in event
                 event->AddScintillation_ev();
+
+
+
+                if (scint_spectrum){
+                   //		Get emission spectra.               *************************************
+                   G4double en = sec->GetKineticEnergy();
+                   analysisMan->FillH1(0, en/eV);
+
+                   //run->AddScintillationEnergy(en);
+
+                   analysisMan->FillNtupleFColumn(2, 0, en/eV);
+                   analysisMan->AddNtupleRow(2);
+                }
             }
         }
     }
@@ -326,3 +305,63 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+void SteppingAction::GammaPrimaryInteraction(const G4Step* step, G4AnalysisManager* aMan, G4int evID, Run* run){
+  G4StepPoint* end = step->GetPostStepPoint();
+  G4StepPoint* start = step->GetPreStepPoint();
+
+  G4ThreeVector vec = end->GetPosition();
+  G4double z2 	= vec.z();
+  G4Track* track = step->GetTrack();
+  G4int trackID = track->GetTrackID();
+
+  G4String proc =  end->GetProcessDefinedStep()->GetProcessName();
+  G4float en_track 	= track->GetKineticEnergy();
+
+  aMan->FillNtupleIColumn(6, 0, evID);
+  aMan->FillNtupleIColumn(6, 1, trackID);
+  aMan->FillNtupleFColumn(6, 2, z2/mm);
+
+  if (proc =="conv"){
+    // track->SetTrackStatus(fKillTrackAndSecondaries);
+    run->AddConv();
+    aMan->FillNtupleIColumn(6, 3, 0);		//conv - 0
+    aMan->AddNtupleRow(6);
+  }
+
+  else if (proc =="compt"){
+    run->AddCompt();
+    aMan->FillNtupleIColumn(6, 3, 1);		//compt - 1
+    aMan->AddNtupleRow(6);
+    //  track->SetTrackStatus(fKillTrackAndSecondaries);
+
+    if ((trackID==1) and (theta)) {
+      G4ThreeVector momentum_gamma_0 = start->GetMomentum();
+      double theta_gamma_0 = momentum_gamma_0.theta();
+      double phi_gamma_0 = momentum_gamma_0.phi();
+      double gamma_ekin_0 = start->GetKineticEnergy()/keV;
+      G4ThreeVector momentum_gamma_1 = end->GetMomentum();
+      double theta_gamma_1 = momentum_gamma_1.theta();
+      double phi_gamma_1 = momentum_gamma_1.phi();
+      double gamma_ekin_1 = end->GetKineticEnergy()/keV;
+
+      aMan->FillNtupleIColumn(8, 0, evID);
+      aMan->FillNtupleDColumn(8, 1, phi_gamma_0);
+      aMan->FillNtupleDColumn(8, 2, phi_gamma_1);
+      aMan->FillNtupleDColumn(8, 3, theta_gamma_0);
+      aMan->FillNtupleDColumn(8, 4, theta_gamma_1);
+      aMan->FillNtupleDColumn(8, 5, gamma_ekin_0);
+      aMan->FillNtupleDColumn(8, 6, gamma_ekin_1);
+      aMan->AddNtupleRow(8);
+    }
+  }
+
+  else if (proc =="phot"){
+    //track->SetTrackStatus(fKillTrackAndSecondaries);
+    run->AddPhot();
+    aMan->FillNtupleIColumn(6, 3, 2);		//phot - 2
+    aMan->AddNtupleRow(6);
+  }
+  aMan->FillNtupleFColumn(6, 4, en_track/keV);
+
+}

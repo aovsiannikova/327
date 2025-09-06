@@ -1,0 +1,23 @@
+/run/verbose 0
+/process/verbose 0
+/event/verbose 0
+/tracking/verbose -1
+/vis/disable
+/tracking/storeTrajectory 0
+
+#/process/em/auger 1
+#/process/em/augerCascade 1
+#/process/em/pixe 1
+#/process/em/deexcitationIgnoreCut 1
+#/process/em/pixeXSmodel
+
+/gun/particle gamma
+
+/gun/direction 0 0 1
+/gun/position 0 0 -5.1 mm
+/gun/energy 20 keV
+#/gun/polarization 0 0 1
+
+/opnovice2/detectorShapeQuadratic 0
+
+/run/beamOn 1

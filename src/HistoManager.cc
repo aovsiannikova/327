@@ -68,14 +68,38 @@ void HistoManager::Book()
 //Ntuple for photons count.
 
   analysisManager->CreateNtuple("phot_count", "number of scintillated photons");
+  analysisManager->CreateNtupleIColumn("eventID");
   analysisManager->CreateNtupleIColumn("counts");
+  analysisManager->CreateNtupleIColumn("counts_0");
+  analysisManager->CreateNtupleIColumn("counts_1");
+  analysisManager->CreateNtupleIColumn("counts_2");
+  analysisManager->CreateNtupleIColumn("counts_3");
+  analysisManager->CreateNtupleIColumn("counts_4");
+  analysisManager->CreateNtupleIColumn("counts_5");
+  analysisManager->CreateNtupleIColumn("counts_6");
+  analysisManager->CreateNtupleIColumn("counts_7");
+  analysisManager->CreateNtupleIColumn("counts_8");
+  analysisManager->CreateNtupleIColumn("counts_9");
+
   analysisManager->FinishNtuple();
 
-  analysisManager->CreateH2("absXY","XY distribution of photons absorbed in SiPM", 51, -25.5, 25.5, 51, -25.5, 25.5);
-  analysisManager->CreateH2("X_ev","X distribution in event", 51, -25.5, 25.5, 10, 0, 10);
+  //analysisManager->CreateH2("absXY","XY distribution of photons absorbed in SiPM",
+  //                          51, -25.5, 25.5, 51, -25.5, 25.5);
+  analysisManager->CreateH2("absXY","XY distribution of photons absorbed in SiPM",
+                            18, -27, 27, 17, -25.5, 25.5);
+
+  analysisManager->CreateH2("X_ev","X distribution in event", 51, -25.5, 25.5, 1, 0, 1);
+  analysisManager->CreateH2("R_ev","R distribution in event", 361, 0.1, 36.1, 100, 1, 100);
+
+  analysisManager->CreateH1("sc_spec", "scintillation spectrum", 250, 1.77, 3.31);
+  analysisManager->CreateH1("absR","R distribution of photons absorbed in SiPM",
+                            3610, 0, 36.1);
+  analysisManager->CreateH1("absX","X distribution of photons absorbed in SiPM",
+                            510, -25.5, 25.5);
 
 //Ntuple for absorption position.
   analysisManager->CreateNtuple("absorption", "absorption position XY");
+  analysisManager->CreateNtupleIColumn(1, "eventID");
   analysisManager->CreateNtupleFColumn(1, "x");
   analysisManager->CreateNtupleFColumn(1, "y");
   analysisManager->FinishNtuple(1);
@@ -116,6 +140,24 @@ void HistoManager::Book()
 	analysisManager->CreateNtupleIColumn(6, "TrackID");
   analysisManager->CreateNtupleFColumn(6, "pr_int_depth");
 	analysisManager->CreateNtupleIColumn(6, "interactionID");
+  analysisManager->CreateNtupleFColumn(6, "energy_track");
+
   analysisManager->FinishNtuple(6);
+
+  //Ntuple for scintillation depth.
+  analysisManager->CreateNtuple("scint_depth_std", "scintillation depth std");
+  analysisManager->CreateNtupleFColumn(7, "z");
+  analysisManager->FinishNtuple(7);
+
+  //Ntuple for phi and thetha.
+  analysisManager->CreateNtuple("scat_angles", "scattering angle");
+  analysisManager->CreateNtupleIColumn(8, "eventID");
+  analysisManager->CreateNtupleDColumn(8, "phi_0");
+  analysisManager->CreateNtupleDColumn(8, "phi");
+  analysisManager->CreateNtupleDColumn(8, "theta_0");
+  analysisManager->CreateNtupleDColumn(8, "theta");
+  analysisManager->CreateNtupleDColumn(8, "Ekin_0");
+  analysisManager->CreateNtupleDColumn(8, "Ekin_1");
+  analysisManager->FinishNtuple(8);
 
 }

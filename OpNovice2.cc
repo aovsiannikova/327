@@ -43,7 +43,9 @@
 
 #include "FTFP_BERT.hh"
 #include "G4OpticalPhysics.hh"
+
 #include "G4EmLivermorePhysics.hh"
+#include "G4EmLivermorePolarizedPhysics.hh"
 
 #include "DetectorConstruction.hh"
 
@@ -53,7 +55,7 @@
 #include "G4UIExecutive.hh"
 #include "G4SystemOfUnits.hh"
 
-//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo.....
 
 int main(int argc, char** argv)
 {
@@ -77,17 +79,20 @@ int main(int argc, char** argv)
   runManager->SetUserInitialization(detector);
 
   G4VModularPhysicsList* physicsList = new FTFP_BERT(0);
-  physicsList->ReplacePhysics(new G4EmLivermorePhysics(0));
+  physicsList->ReplacePhysics(new G4EmLivermorePolarizedPhysics(0));
+ // physicsList->ReplacePhysics(new G4EmLivermorePhysics(0));
+
   physicsList->SetDefaultCutValue(0.00001*CLHEP::mm);
   G4OpticalPhysics* opticalPhysics = new G4OpticalPhysics(0);
 
   physicsList->RegisterPhysics(opticalPhysics);
   runManager->SetUserInitialization(physicsList);
 
-  runManager->SetUserInitialization(new ActionInitialization());
+  runManager->SetUserInitialization(new ActionInitialization(detector));
+  physicsList->SetVerboseLevel(-1);
 
   //initialize visualization
-  G4VisManager* visManager = new G4VisExecutive;
+  G4VisManager* visManager = new G4VisExecutive("0");
   visManager->Initialize();
 
   //get the pointer to the User Interface manager 
@@ -95,6 +100,8 @@ int main(int argc, char** argv)
 
   if (ui)  {
     //interactive mode
+    UImanager->ApplyCommand("/control/execute ../OpNovice2.in");
+
     UImanager->ApplyCommand("/control/execute vis.mac");
     ui->SessionStart();
     delete ui;

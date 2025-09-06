@@ -33,7 +33,6 @@
 
 #include "DetectorMessenger.hh"
 
-#include <sstream>
 #include <iostream>
 
 #include "G4OpticalSurface.hh"
@@ -41,7 +40,7 @@
 #include "DetectorConstruction.hh"
 #include "G4UIdirectory.hh"
 #include "G4UIcommand.hh"
-#include "G4UIparameter.hh"
+#include "G4UIcmdWithABool.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithADouble.hh"
 #include "G4UIcmdWithAnInteger.hh"
@@ -99,6 +98,81 @@ DetectorMessenger::DetectorMessenger(DetectorConstruction * Det)
   fBoxMatConstPropVectorCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
   fBoxMatConstPropVectorCmd->SetToBeBroadcasted(false);
 
+  fDetectorDir = new G4UIdirectory("/opnovice2/detector/");
+  fDetectorDir->SetGuidance("Parameters of detector.");
+
+  fDetectorSetSectionCmd =
+          new G4UIcmdWithAnInteger("/opnovice2/detector/setDetectorSection", this);
+  fDetectorSetSectionCmd->SetGuidance("Set detector shape: ");
+  fDetectorSetSectionCmd->SetGuidance("quadratic or not.");
+  fDetectorSetSectionCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetSectionCmd->SetToBeBroadcasted(false);
+
+  fDetectorHasReflectorCmd =
+          new G4UIcmdWithABool("/opnovice2/detector/detectorHasReflector", this);
+  fDetectorHasReflectorCmd->SetGuidance("Set existence of a reflector.");
+  fDetectorHasReflectorCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorHasReflectorCmd->SetToBeBroadcasted(false);
+
+  fDetectorHasHousingCmd =
+          new G4UIcmdWithABool("/opnovice2/detector/detectorHasHousing", this);
+  fDetectorHasHousingCmd->SetGuidance("Set existence of an Alu.");
+  fDetectorHasHousingCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorHasHousingCmd->SetToBeBroadcasted(false);
+
+  fDetectorSetNumberOfSiPM =
+          new G4UIcmdWithAnInteger("/opnovice2/detector/setNumberOfSiPM", this);
+  fDetectorSetNumberOfSiPM->SetGuidance("1 - XY, 2 - XY and YZ, 3 - XY and 2 YZ.");
+  fDetectorSetNumberOfSiPM->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetNumberOfSiPM->SetToBeBroadcasted(false);
+
+  fDetectorSetThicknessCmd =
+          new G4UIcmdWithADouble("/opnovice2/detector/setDetectorThickness", this);
+  fDetectorSetThicknessCmd->SetGuidance("Set thickness (z) of the CeBr3 crystal.");
+  fDetectorSetThicknessCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetThicknessCmd->SetToBeBroadcasted(false);
+
+
+  fReflectorSetTypeCmd =
+          new G4UIcmdWithAnInteger("/opnovice2/detector/setReflectorType", this);
+  fReflectorSetTypeCmd->SetGuidance("Set type of the reflector: ");
+  fReflectorSetTypeCmd->SetGuidance("0 - A, only diff reflection with 0.97 reflectivity;");
+  fReflectorSetTypeCmd->SetGuidance("1 - B, Spec Spike reflection on scint-air surface (sigalpha=0),");
+  fReflectorSetTypeCmd->SetGuidance("diff reflection on air-tefl Surface;");
+  fReflectorSetTypeCmd->SetGuidance("2 - C, Spec Spike reflection on scint-air surface,");
+  fReflectorSetTypeCmd->SetGuidance("Spec Spike on air-tefl surface;");
+  fReflectorSetTypeCmd->SetGuidance("3 - D, diffuse reflection on scint-air surface (sigalpha = 0.6),");
+  fReflectorSetTypeCmd->SetGuidance("diffuse reflection on air-tefl surface.");
+  fReflectorSetTypeCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fReflectorSetTypeCmd->SetToBeBroadcasted(false);
+
+  fDetectorSetSideLengthCmd =
+     new G4UIcmdWithADouble("/opnovice2/detector/setDetectorSideLength", this);
+  fDetectorSetSideLengthCmd->SetGuidance("Set the length (y) of the quadratic crystal.");
+  fDetectorSetSideLengthCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetSideLengthCmd->SetToBeBroadcasted(false);
+
+  fDetectorSetWidthCmd =
+          new G4UIcmdWithADouble("/opnovice2/detector/setDetectorWidth", this);
+  fDetectorSetWidthCmd->SetGuidance("Set the width (x) of the quadratic crystal.");
+  fDetectorSetWidthCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetWidthCmd->SetToBeBroadcasted(false);
+
+  fDetectorSetRadiusCmd =
+          new G4UIcmdWithADouble("/opnovice2/detector/setDetectorRadius", this);
+  fDetectorSetRadiusCmd->SetGuidance("Set the radius of the cylindrical crystal (XY plane).");
+  fDetectorSetRadiusCmd->SetGuidance("12.2 *mm; // 2.54cm diameter: r=25.4/2=12.2 mm,");
+  fDetectorSetRadiusCmd->SetGuidance("25.5 *mm; // 5.1cm = 51 mm diameter, r=51mm/2 = 25.5 mm.");
+  fDetectorSetRadiusCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetRadiusCmd->SetToBeBroadcasted(false);
+
+  fDetectorSetMaterialCmd =
+          new G4UIcmdWithAnInteger ("/opnovice2/detector/setDetectorMaterial", this);
+  fDetectorSetMaterialCmd->SetGuidance("Set the material of the crystal.");
+  fDetectorSetMaterialCmd->SetGuidance("Type 0 for CeBr3, 1 for CsI(Tl) or 2 for NaI(Tl)");
+  fDetectorSetMaterialCmd->AvailableForStates(G4State_PreInit, G4State_Idle);
+  fDetectorSetMaterialCmd->SetToBeBroadcasted(false);
+
   fWorldMatPropVectorCmd =
     new G4UIcmdWithAString("/opnovice2/worldProperty", this);
   fWorldMatPropVectorCmd->SetGuidance("Set material property vector ");
@@ -125,6 +199,16 @@ DetectorMessenger::~DetectorMessenger()
   delete fSurfaceModelCmd;
   delete fSurfaceSigmaAlphaCmd;
   delete fSurfaceMatPropVectorCmd;
+  delete fDetectorSetSectionCmd;
+  delete fDetectorHasReflectorCmd;
+  delete fDetectorHasHousingCmd;
+  delete fDetectorSetNumberOfSiPM;
+  delete fDetectorSetThicknessCmd;
+  delete fDetectorSetSideLengthCmd;
+  delete fDetectorSetWidthCmd;
+  delete fDetectorSetMaterialCmd;
+  delete fDetectorSetRadiusCmd;
+  delete fReflectorSetTypeCmd;
   delete fBoxMatPropVectorCmd;
   delete fBoxMatConstPropVectorCmd;
   delete fWorldMatPropVectorCmd;
@@ -311,12 +395,63 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
     fDetector->SetSurfaceSigmaAlpha(
       G4UIcmdWithADouble::GetNewDoubleValue(newValue));
   }
+
+  else if (command == fDetectorSetSectionCmd) {
+    fDetector->SetDetectorSection(
+            G4UIcmdWithAnInteger::GetNewIntValue(newValue));
+  }
+
+  else if (command == fDetectorHasReflectorCmd) {
+    fDetector->SetDetectorHasReflector(
+            G4UIcmdWithABool::GetNewBoolValue(newValue));
+  }
+
+  else if (command == fDetectorHasHousingCmd) {
+    fDetector->SetDetectorHasAlu(
+            G4UIcmdWithABool::GetNewBoolValue(newValue));
+  }
+
+  else if (command == fDetectorSetNumberOfSiPM) {
+    fDetector->ChangeNumberOfSiPM(
+            G4UIcmdWithAnInteger::GetNewIntValue(newValue));
+  }
+
+  else if (command == fDetectorSetThicknessCmd) {
+    fDetector->SetCrystalThickness(
+            G4UIcmdWithADouble::GetNewDoubleValue(newValue));
+  }
+
+  else if (command == fDetectorSetSideLengthCmd) {
+    fDetector->SetQuadraticCrystalSideLength(
+            G4UIcmdWithADouble::GetNewDoubleValue(newValue));
+  }
+
+  else if (command == fDetectorSetWidthCmd) {
+    fDetector->SetQuadraticCrystalWidth(
+            G4UIcmdWithADouble::GetNewDoubleValue(newValue));
+  }
+
+  else if (command == fDetectorSetRadiusCmd) {
+    fDetector->SetCylindricalCrystalRadius(
+            G4UIcmdWithADouble::GetNewDoubleValue(newValue));
+  }
+
+  else if (command == fReflectorSetTypeCmd) {
+    fDetector->SetReflectorType(
+            G4UIcmdWithAnInteger::GetNewIntValue(newValue));
+  }
+
+  else if (command == fDetectorSetMaterialCmd) {
+    fDetector->SetScintillatorMaterial(
+            G4UIcmdWithAnInteger::GetNewIntValue(newValue));
+  }
+
   else if (command == fBoxMatPropVectorCmd) {
     // got a string. need to convert it to physics vector.
     // string format is property name, then pairs of energy, value  
     // specify units for each value, eg 3.0*eV
     // space delimited
-    G4MaterialPropertyVector* mpv = new G4MaterialPropertyVector();
+    auto * mpv = new G4MaterialPropertyVector();
     mpv->SetSpline(true);
     std::istringstream instring(newValue);
     G4String prop;
@@ -338,7 +473,7 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
   else if (command == fWorldMatPropVectorCmd) {
     // Convert string to physics vector
     // string format is property name, then pairs of energy, value  
-    G4MaterialPropertyVector* mpv = new G4MaterialPropertyVector();
+    auto * mpv = new G4MaterialPropertyVector();
     std::istringstream instring(newValue);
     G4String prop;
     instring >> prop;
@@ -359,7 +494,7 @@ void DetectorMessenger::SetNewValue(G4UIcommand* command,G4String newValue)
     // Convert string to physics vector
     // string format is property name, then pairs of energy, value  
     // space delimited
-    G4MaterialPropertyVector* mpv = new G4MaterialPropertyVector();
+    auto * mpv = new G4MaterialPropertyVector();
     G4cout << newValue << G4endl;
     std::istringstream instring(newValue);
     G4String prop;

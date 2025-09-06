@@ -169,26 +169,26 @@ class Run : public G4Run
     G4double fScintEnergy;
 
     // number of particles
-    G4int fScintCount;
-    G4int fRayleighCount;
+    G4long fScintCount;
+    G4long fRayleighCount;
 
     // non-boundary processes
-    G4int fOpAbsorption;
+    G4long fOpAbsorption;
     // in SiPM
-    G4int fSiPMOpAbsorption;
+    G4long fSiPMOpAbsorption;
     G4double fSiPMEnergy;
 
     // in Scintillator
-    G4int fScOpAbsorption;
+    G4long fScOpAbsorption;
     // prior to boundary:
-    G4int fOpAbsorptionPrior;
-    G4int fOpAbsorptionPriorSiPM;
-    G4int fOpAbsorptionPriorScint;
+    G4long fOpAbsorptionPrior;
+    G4long fOpAbsorptionPriorSiPM;
+    G4long fOpAbsorptionPriorScint;
 
     // boundary proc
     std::vector<G4int> fBoundaryProcs;
 
-    G4int fTotalSurface;
+    G4long fTotalSurface;
 
 };
 
